@@ -1,3 +1,4 @@
+-- Top users by revenue
 SELECT
     user_id,
     SUM(revenue) AS total_revenue
