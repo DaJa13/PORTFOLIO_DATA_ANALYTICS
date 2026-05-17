@@ -1,26 +1,66 @@
 # Data Analytics Portfolio — Daniil Yanovskiy
 
-Junior Data Analyst focused on SQL, Python (pandas) and product analytics.
+Junior+ Data Analyst с фокусом на SQL, CRM-аналитику и продуктовую аналитику.
+Пишу SQL-запросы для анализа бизнес-данных и построения метрик.
+---
 
-## Skills
-- SQL
-- Python (pandas)
+## Навыки
+
+SQL (PostgreSQL)
+- JOIN (INNER, LEFT)
+- GROUP BY / HAVING
+- CASE WHEN
+- CTE (WITH)
+- оконные функции (базовый уровень)
+
+Python (базовый уровень)
+- знаком с pandas
+- базовая работа с таблицами (чтение/фильтрация данных)
+
+Аналитика
+- CRM-аналитика
+- продуктовые метрики (AOV, retention, frequency)
+- сегментация клиентов
+- анализ воронки продаж
+- анализ выручки
+
+Инструменты
 - Excel / Google Sheets
-- Basic Power BI / Tableau
-- Product Analytics
+- PostgreSQL / pgAdmin
+- Git / GitHub
 
 ---
 
-# Projects
+## Проекты
+
+CRM SQL аналитика (PostgreSQL)
+Анализ данных CRM-системы: компании, платежи, контакты, напоминания, сертификаты.
+
+Задачи:
+- анализ выручки и среднего чека
+- сегментация клиентов (VIP / Medium / Low)
+- анализ повторных клиентов
+- анализ активности и оттока
+- email-сегментация по типам сертификатов
+- анализ прибыльности сертификатов
 
 SQL Case Studies
-SQL interview-level tasks and analytical queries.
+30+ SQL задач уровня собеседований:
+- JOIN между таблицами
+- агрегации и группировки
+- подзапросы и CTE
+- бизнес-задачи на SQL
 
-Tech stack:
-- SQL
+Анализ поведения пользователей (SQL + Python)
+- анализ 10 000+ заказов пользователей
+- расчет AOV, retention, frequency
+- сегментация пользователей (новые / активные / неактивные)
+- выявление падения удержания
+- базовые продуктовые выводы
 
 ---
 
-## Contacts
-Telegram: 
-Email: 
+## Технологический стек
+
+SQL • Python (pandas) • PostgreSQL • Excel 
+
