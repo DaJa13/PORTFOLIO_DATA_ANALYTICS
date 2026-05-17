@@ -1,25 +1,177 @@
--- Top users by revenue
+
+-- 1. Общая сумма платежей по компаниям
 SELECT
-    user_id,
-    SUM(revenue) AS total_revenue
-FROM orders
-GROUP BY user_id
-ORDER BY total_revenue DESC;
+    c.id,
+    c.name,
+    SUM(p.amount) AS total_payments
+FROM crm_company c
+JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY total_payments DESC;
 
 
--- Returning users
+-- 2. Средний платеж по компаниям
 SELECT
-    user_id,
-    COUNT(*) AS orders_count
-FROM orders
-GROUP BY user_id
-HAVING COUNT(*) > 1;
+    c.id,
+    c.name,
+    AVG(p.amount) AS avg_payment
+FROM crm_company c
+JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY avg_payment DESC;
 
 
--- Revenue by month
+-- 3. Количество платежей по компаниям
 SELECT
-    DATE_TRUNC('month', order_date) AS month,
-    SUM(revenue) AS revenue
-FROM orders
-GROUP BY month
-ORDER BY month;
+    c.id,
+    c.name,
+    COUNT(p.id) AS payments_count
+FROM crm_company c
+JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY payments_count DESC;
+
+
+-- 4. Активность компаний (выручка + количество + средний чек)
+SELECT
+    c.id,
+    c.name,
+    COUNT(p.id) AS payments_count,
+    COALESCE(SUM(p.amount), 0) AS total_payments,
+    COALESCE(AVG(p.amount), 0) AS avg_payment
+FROM crm_company c
+LEFT JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY total_payments DESC;
+
+
+-- 5. Количество контактов по компаниям
+SELECT
+    c.id,
+    c.name,
+    COUNT(ct.id) AS contacts_count
+FROM crm_company c
+LEFT JOIN crm_contact ct
+    ON ct.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY contacts_count DESC;
+
+
+-- 6. Количество напоминаний по компаниям
+SELECT
+    c.id,
+    c.name,
+    COUNT(r.id) AS reminders_count
+FROM crm_company c
+LEFT JOIN crm_reminder r
+    ON r.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY reminders_count DESC;
+
+
+-- 7. Сегментация выручки (VIP / Средний / Низкий)
+SELECT
+    c.id,
+    c.name,
+    COALESCE(SUM(p.amount), 0) AS total_payments,
+    CASE
+        WHEN COALESCE(SUM(p.amount), 0) >= 90000 THEN 'VIP'
+        WHEN COALESCE(SUM(p.amount), 0) > 10000 THEN 'Средний'
+        ELSE 'Низкий'
+    END AS segment
+FROM crm_company c
+LEFT JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+ORDER BY total_payments DESC;
+
+
+-- 8. Постоянные клиенты (2+ платежа)
+SELECT
+    c.id,
+    c.name,
+    COUNT(p.id) AS payments_count,
+    SUM(p.amount) AS revenue
+FROM crm_company c
+LEFT JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.id, c.name
+HAVING COUNT(p.id) >= 2
+ORDER BY revenue DESC;
+
+
+-- 9. Отток клиентов (1 платеж = низкая активность)
+WITH payments_ranked AS (
+    SELECT
+        company__id,
+        amount,
+        ROW_NUMBER() OVER (PARTITION BY company__id ORDER BY id) AS rn
+    FROM crm_payments
+)
+SELECT
+    c.name,
+    COUNT(p.company__id) AS total_payments
+FROM crm_company c
+JOIN payments_ranked p
+    ON p.company__id = c.id
+GROUP BY c.name
+HAVING COUNT(p.company__id) = 1;
+
+
+-- 10. Прибыльность сертификатов
+SELECT
+    vc.name AS certificate,
+    COUNT(DISTINCT c.id) AS companies,
+    COALESCE(SUM(p.amount), 0) AS revenue
+FROM crm_company c
+LEFT JOIN crm_view_certificate vc
+    ON vc.id = c.view_certificate__id
+LEFT JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY vc.name
+ORDER BY revenue DESC;
+
+
+-- 11. Сертификаты с истечением в ближайшие 30 дней
+SELECT
+    c.id,
+    c.name,
+    vc.name AS certificate,
+    c.date_end,
+    COUNT(r.id) AS reminders_count
+FROM crm_company c
+LEFT JOIN crm_view_certificate vc
+    ON vc.id = c.view_certificate__id
+LEFT JOIN crm_reminder r
+    ON r.company__id = c.id
+WHERE c.date_end BETWEEN CURRENT_DATE
+                      AND CURRENT_DATE + INTERVAL '30 days'
+GROUP BY c.id, c.name, vc.name, c.date_end
+ORDER BY c.date_end;
+
+
+-- 12. Выгрузка email всех компаний
+SELECT
+    c.id,
+    c.name,
+    c.email
+FROM crm_company c
+WHERE c.email IS NOT NULL
+ORDER BY c.name;
+
+
+-- 13. Email-выгрузка по типам сертификатов
+SELECT
+    vc.name AS certificate_type,
+    c.id,
+    c.name,
+    c.email
+FROM crm_company c
+JOIN crm_view_certificate vc
+    ON vc.id = c.view_certificate__id
+WHERE c.email IS NOT NULL
+ORDER BY vc.name, c.name;
