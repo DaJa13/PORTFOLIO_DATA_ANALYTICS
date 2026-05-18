@@ -161,6 +161,7 @@ SELECT
     c.email
 FROM crm_company c
 WHERE c.email IS NOT NULL
+AND c.email <> ''
 ORDER BY c.name;
 
 
@@ -174,4 +175,5 @@ FROM crm_company c
 JOIN crm_view_certificate vc
     ON vc.id = c.view_certificate__id
 WHERE c.email IS NOT NULL
+AND c.email <> ''
 ORDER BY vc.name, c.name;
