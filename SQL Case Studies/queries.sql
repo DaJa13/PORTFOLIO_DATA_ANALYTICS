@@ -104,25 +104,41 @@ HAVING COUNT(p.id) >= 2
 ORDER BY revenue DESC;
 
 
--- 9. Отток клиентов (1 платеж = низкая активность)
-WITH payments_ranked AS (
+-- 9. Клиенты с низкой активностью (1 платеж)
+
+SELECT
+    c.name,
+    COUNT(p.id) AS payments_count
+FROM crm_company c
+JOIN crm_payments p
+    ON p.company__id = c.id
+GROUP BY c.name
+HAVING COUNT(p.id) = 1;
+
+-- 10. Последний платеж клиента (id как прокси времени)
+
+WITH ranked_payments AS (
     SELECT
         company__id,
         amount,
-        ROW_NUMBER() OVER (PARTITION BY company__id ORDER BY id) AS rn
+        id,
+        ROW_NUMBER() OVER (
+            PARTITION BY company__id
+            ORDER BY id DESC) AS rn
     FROM crm_payments
-)
+    )
 SELECT
     c.name,
-    COUNT(p.company__id) AS total_payments
+    rp.amount,
+    rp.id
 FROM crm_company c
-JOIN payments_ranked p
-    ON p.company__id = c.id
-GROUP BY c.name
-HAVING COUNT(p.company__id) = 1;
+JOIN ranked_payments rp
+    ON rp.company__id = c.id
+WHERE rp.rn = 1
+ORDER BY id DESC;
 
 
--- 10. Прибыльность сертификатов
+-- 11. Прибыльность сертификатов
 SELECT
     vc.name AS certificate,
     COUNT(DISTINCT c.id) AS companies,
@@ -136,7 +152,7 @@ GROUP BY vc.name
 ORDER BY revenue DESC;
 
 
--- 11. Сертификаты с истечением в ближайшие 30 дней
+-- 12. Сертификаты с истечением в ближайшие 30 дней
 SELECT
     c.id,
     c.name,
@@ -154,7 +170,7 @@ GROUP BY c.id, c.name, vc.name, c.date_end
 ORDER BY c.date_end;
 
 
--- 12. Выгрузка email всех компаний
+-- 13. Выгрузка email всех компаний
 SELECT
     c.id,
     c.name,
@@ -165,7 +181,7 @@ AND c.email <> ''
 ORDER BY c.name;
 
 
--- 13. Email-выгрузка по типам сертификатов
+-- 14. Email-выгрузка по типам сертификатов
 SELECT
     vc.name AS certificate_type,
     c.id,
