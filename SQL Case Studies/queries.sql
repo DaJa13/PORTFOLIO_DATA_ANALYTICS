@@ -49,7 +49,15 @@ GROUP BY c.id, c.name
 ORDER BY total_payments DESC;
 
 
--- 5. Количество контактов по компаниям
+-- 5. Количество компаний по месяцам,
+SELECT
+    TO_CHAR(date_issue, 'YYYY-MM') AS month,
+    COUNT(*) AS companies
+FROM crm_company
+GROUP BY TO_CHAR(date_issue, 'YYYY-MM')
+ORDER BY month;
+
+-- 6. Количество контактов по компаниям
 SELECT
     c.id,
     c.name,
@@ -61,7 +69,7 @@ GROUP BY c.id, c.name
 ORDER BY contacts_count DESC;
 
 
--- 6. Количество напоминаний по компаниям
+-- 7. Количество напоминаний по компаниям
 SELECT
     c.id,
     c.name,
@@ -73,7 +81,7 @@ GROUP BY c.id, c.name
 ORDER BY reminders_count DESC;
 
 
--- 7. Сегментация выручки (VIP / Средний / Низкий)
+-- 8. Сегментация выручки (VIP / Средний / Низкий)
 SELECT
     c.id,
     c.name,
@@ -90,7 +98,7 @@ GROUP BY c.id, c.name
 ORDER BY total_payments DESC;
 
 
--- 8. Постоянные клиенты (2+ платежа)
+-- 9. Постоянные клиенты (2+ платежа)
 SELECT
     c.id,
     c.name,
@@ -104,7 +112,7 @@ HAVING COUNT(p.id) >= 2
 ORDER BY revenue DESC;
 
 
--- 9. Клиенты с низкой активностью (1 платеж)
+-- 10. Клиенты с низкой активностью (1 платеж)
 
 SELECT
     c.id,
@@ -116,7 +124,7 @@ JOIN crm_payments p
 GROUP BY c.name
 HAVING COUNT(p.id) = 1;
 
--- 10. Последний платеж клиента (по id как прокси времени)
+-- 11. Последний платеж клиента (по id как прокси времени)
 
 WITH ranked_payments AS (
     SELECT
@@ -140,7 +148,7 @@ JOIN ranked_payments rp
 WHERE rp.rn = 1
 ORDER BY rp.id DESC;
 
--- 11. Прибыльность сертификатов
+-- 12. Прибыльность сертификатов
 SELECT
     vc.name AS certificate,
     COUNT(DISTINCT c.id) AS companies,
@@ -154,7 +162,7 @@ GROUP BY vc.name
 ORDER BY revenue DESC;
 
 
--- 12. Сертификаты с истечением в ближайшие 30 дней
+-- 13. Сертификаты с истечением в ближайшие 30 дней
 SELECT
     c.id,
     c.name,
@@ -172,7 +180,7 @@ GROUP BY c.id, c.name, vc.name, c.date_end
 ORDER BY c.date_end;
 
 
--- 13. Выгрузка email всех компаний
+-- 14. Выгрузка email всех компаний
 SELECT
     c.id,
     c.name,
@@ -183,7 +191,7 @@ AND c.email <> ''
 ORDER BY c.name;
 
 
--- 14. Email-выгрузка по типам сертификатов
+-- 154. Email-выгрузка по типам сертификатов
 SELECT
     vc.name AS certificate_type,
     c.id,
