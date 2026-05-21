@@ -49,7 +49,7 @@ GROUP BY c.id, c.name
 ORDER BY total_payments DESC;
 
 
--- 5. Количество компаний по месяцам,
+-- 5. Количество компаний по месяцам
 SELECT
     TO_CHAR(date_issue, 'YYYY-MM') AS month,
     COUNT(*) AS companies
@@ -121,7 +121,7 @@ SELECT
 FROM crm_company c
 JOIN crm_payments p
     ON p.company__id = c.id
-GROUP BY c.name
+GROUP BY c.id, c.name
 HAVING COUNT(p.id) = 1;
 
 -- 11. Последний платеж клиента (по id как прокси времени)
@@ -191,7 +191,7 @@ AND c.email <> ''
 ORDER BY c.name;
 
 
--- 154. Email-выгрузка по типам сертификатов
+-- 15. Email-выгрузка по типам сертификатов
 SELECT
     vc.name AS certificate_type,
     c.id,
