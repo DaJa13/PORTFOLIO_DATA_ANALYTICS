@@ -107,6 +107,7 @@ ORDER BY revenue DESC;
 -- 9. Клиенты с низкой активностью (1 платеж)
 
 SELECT
+    c.id,
     c.name,
     COUNT(p.id) AS payments_count
 FROM crm_company c
@@ -115,7 +116,7 @@ JOIN crm_payments p
 GROUP BY c.name
 HAVING COUNT(p.id) = 1;
 
--- 10. Последний платеж клиента (id как прокси времени)
+-- 10. Последний платеж клиента (по id как прокси времени)
 
 WITH ranked_payments AS (
     SELECT
@@ -124,19 +125,20 @@ WITH ranked_payments AS (
         id,
         ROW_NUMBER() OVER (
             PARTITION BY company__id
-            ORDER BY id DESC) AS rn
+            ORDER BY id DESC
+        ) AS rn
     FROM crm_payments
-    )
+)
 SELECT
+    c.id,
     c.name,
     rp.amount,
-    rp.id
+    rp.id AS payment_id
 FROM crm_company c
 JOIN ranked_payments rp
     ON rp.company__id = c.id
 WHERE rp.rn = 1
-ORDER BY id DESC;
-
+ORDER BY rp.id DESC;
 
 -- 11. Прибыльность сертификатов
 SELECT
