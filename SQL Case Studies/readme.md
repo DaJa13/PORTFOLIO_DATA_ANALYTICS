@@ -14,15 +14,6 @@ CRM включает данные о компаниях-клиентах, пла
 - Window Functions
 - CTE
 
-## Структура данных
-
-Основные таблицы проекта:
-- crm_company — компании-клиенты
-- crm_payments — платежи клиентов
-- crm_contact — контакты компаний
-- crm_reminder — напоминания и задачи
-- crm_view_certificate — типы сертификатов
-
 ## Схема связей
 
 ```text
@@ -33,6 +24,15 @@ crm_company
 ├── crm_reminder
 └── crm_view_certificate
 ```
+
+## Структура данных
+
+Основные таблицы проекта:
+- crm_company — компании-клиенты
+- crm_payments — платежи клиентов
+- crm_contact — контакты компаний
+- crm_reminder — напоминания и задачи
+- crm_view_certificate — типы сертификатов
 
 ## Метрики и анализ
 
