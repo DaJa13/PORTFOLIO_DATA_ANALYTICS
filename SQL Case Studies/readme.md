@@ -22,7 +22,6 @@ CRM включает данные о компаниях-клиентах, пла
 - crm_contact — контакты компаний
 - crm_reminder — напоминания и задачи
 - crm_view_certificate — типы сертификатов
-
 ## Схема связей
 
 ```text
@@ -33,6 +32,7 @@ crm_company
     |--- crm_reminder
     |
     └--- crm_view_certificate
+
 
 ## Метрики и анализ
 
